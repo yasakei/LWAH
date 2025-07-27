@@ -14,11 +14,6 @@ An interactive lyric visualizer for "Line Without a Hook" by Ricky Montgomery. T
 2. Click **Play** to start the lyric experience.
 3. Use the controls at the bottom to pause, reset, or enter fullscreen mode.
 
-## File Overview
-- `index.html`: Main interactive lyric visualizer and player.
-- `index_.html`: (Purpose unknown; possibly a backup or alternate version.)
-- `License`: MIT License for this project.
-
 ## License
 This project is licensed under the MIT License. See the `License` file for details.
 
