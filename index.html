@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Line Without a Hook - The Ultimate Platinum Edition</title>
+    <style>
+        /* --- SETUP & GENERAL STYLES --- */
+        @import url('https://fonts.googleapis.com/css2?family=Comic+Neue:wght@300;400;700&display=swap');
+        
+        :root {
+            --dark-bg: #111;
+            --mid-bg: #1a1a1a;
+            --light-bg: #2b2b2b;
+            --text-main: #e0e0e0;
+            --text-dim: #aaa;
+            --shadow-color: #000;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Comic Neue', cursive;
+            background: linear-gradient(135deg, var(--mid-bg), var(--light-bg), var(--dark-bg));
+            color: var(--text-dim);
+            overflow: hidden;
+            height: 100vh;
+            position: relative;
+        }
+
+        /* --- CINEMATIC OVERLAYS --- */
+        .vignette {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(ellipse at center, rgba(0,0,0,0) 60%, rgba(0,0,0,0.7) 100%);
+            pointer-events: none; z-index: 10;
+        }
+
+        body::after {
+            content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAMAAAAp4XiDAAAAUVBMVEWFhYWDg4N3d3dtbW17e3t1dXWBgYGHh4d5eXlzc3OLi4ubm5uVlZWPj4+NjY19fX2JiYl/f39tbW1paXRrbVtpaVdZWVdbW1xSUlNFRUcuLi7v7+9tbW2jo6M7OzuISUpbAAAAOHRSTlMA+3/p2x4a/UD29vbr3Nve2dng2ci+v8G/u7u7u7u6f3x8fH17e3t7e3t3d3d3d3d1e3p8x6NhAAAAwklEQVR42tSWBw6DMAwF5zY4rvg4e8/9L/Y6V9s0uHrvg+QklZkY99xba9o8f3gKz3/b29t7e8vXn2c8N2/aO83HDf2g93b32gI8a3/j4f0P5oB9d6B/0hAEdwB2g4EMQCFsCkp0PsoB9so5f/inHklf9IBbA9gT4g4AEY4H2Nk02gI8E24DVIiK4H2soyYxVYgeY6XfJs2D9gE5UfAJoFq0i4CdsD5Yp9yQ0sVjQ2Wz4+E6g2WwI/tnd29u729sbwld/sZdQXsoD/QAAAABJRU5ErkJggg==');
+            opacity: 0.08; animation: film-grain 0.3s steps(4) infinite;
+            pointer-events: none; z-index: 11;
+        }
+
+        @keyframes film-grain {
+            0%, 100% { transform: translate(0, 0); } 10% { transform: translate(-1%, -1%); } 20% { transform: translate(1%, 1%); } 30% { transform: translate(-2%, 2%); } 40% { transform: translate(2%, -2%); } 50% { transform: translate(-1%, 2%); } 60% { transform: translate(2%, -1%); } 70% { transform: translate(-2%, -2%); } 80% { transform: translate(1%, 2%); } 90% { transform: translate(2%, 1%); }
+        }
+
+        /* --- SCENE ELEMENTS --- */
+        .moon {
+            position: absolute; bottom: -150px; left: 50%; transform: translateX(-50%);
+            width: 200px; height: 200px; border-radius: 50%;
+            /* FIXED: Softer, more atmospheric moon */
+            box-shadow: inset -20px 20px 0 0 #d8d8d8, 0 0 30px rgba(224, 224, 224, 0.15);
+            animation: rise-moon 60s linear forwards; z-index: 0;
+        }
+        @keyframes rise-moon { from { transform: translate(-50%, 100px); } to { transform: translate(-50%, -300px); } }
+
+        .stars, .hearts-container {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; transition: opacity 1.5s ease-in-out;
+        }
+        .star, .heart {
+            position: absolute; background-color: #fff; border-radius: 50%; animation: twinkle 3s infinite ease-in-out;
+        }
+        .heart {
+            width: 6px; height: 6px; transform: rotate(-45deg);
+        }
+        .heart::before, .heart::after {
+            content: ''; position: absolute; width: 6px; height: 6px; background-color: white; border-radius: 50%;
+        }
+        .heart::before { top: -3px; left: 0; }
+        .heart::after { top: 0; left: 3px; }
+        @keyframes twinkle { 0%, 100% { opacity: 0.2; transform: scale(0.8) rotate(-45deg); } 50% { opacity: 1; transform: scale(1.2) rotate(-45deg); } }
+        .star { animation-name: star-twinkle; }
+        @keyframes star-twinkle { 0%, 100% { opacity: 0.2; transform: scale(0.8); } 50% { opacity: 1; transform: scale(1.2); } }
+
+        .rain-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 3; }
+        .raindrop { position: absolute; background: linear-gradient(to bottom, rgba(180,180,180,0.8), rgba(180,180,180,0.2)); width: 1px; animation: fall linear infinite; }
+        @keyframes fall { 0% { transform: translateY(-100px); } 100% { transform: translateY(100vh); } }
+
+        .ocean-waves {
+            position: fixed; bottom: 0; left: 0; width: 100%; height: 150px; z-index: 2;
+            /* FIXED: Ocean is now hidden by default and activated by JS */
+            opacity: 0;
+            transition: opacity 2s ease-in-out;
+        }
+        .wave { position: absolute; bottom: 0; left: 0; width: 200%; height: 100px; background: #333; border-radius: 50%; animation: wave-motion 10s ease-in-out infinite; border-top: 2px solid #555; opacity: 0.5; }
+        .wave:nth-child(2) { animation-delay: -3s; background: #222; animation-duration: 12s; }
+        .wave:nth-child(3) { animation-delay: -5s; background: #111; animation-duration: 15s; }
+        @keyframes wave-motion { 0%, 100% { transform: translateX(-50%) translateY(20px); } 50% { transform: translateX(-40%) translateY(0px); } }
+
+        /* --- LYRICS & ANIMATIONS --- */
+        .lyrics-container {
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            text-align: center; z-index: 5; width: 90%; max-width: 800px;
+        }
+        .lyric-line {
+            font-size: 5vw; font-weight: 400; margin: 20px 0;
+            line-height: 1.4; color: var(--text-main); text-shadow: 2px 2px 5px var(--shadow-color);
+            /* FIXED: Base opacity is now 1, animations handle the fade-in */
+            opacity: 1;
+        }
+        
+        @keyframes fx-fade-in { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes fx-slide-in-left { from { opacity: 0; transform: translateX(-80px); } to { opacity: 1; transform: translateX(0); } }
+        @keyframes fx-zoom-in { from { opacity: 0; transform: scale(0.7); } to { opacity: 1; transform: scale(1); } }
+        @keyframes fx-drop-in { from { opacity: 0; transform: translateY(-50px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fx-blur-in { from { opacity: 0; filter: blur(10px); } to { opacity: 1; filter: blur(0); } }
+        @keyframes fx-drop-in-and-shake {
+            0% { opacity: 0; transform: translateY(-40px) translateX(0); }
+            60% { opacity: 1; transform: translateY(0) translateX(0); }
+            70% { transform: translateX(-2px); } 80% { transform: translateX(2px); }
+            90% { transform: translateX(-2px); } 100% { transform: translateX(0); }
+        }
+        @keyframes fx-pulse-gentle { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.03); } }
+        @keyframes fx-wave-text { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+        @keyframes fx-float-text { 0%, 100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-15px) rotate(1.5deg); } }
+        @keyframes shake-intense { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-4px)} 40%{transform:translateX(4px)} 60%{transform:translateX(-3px)} 80%{transform:translateX(3px)} }
+
+        .fx-fade-in { animation: fx-fade-in 1.5s ease-out forwards; }
+        .fx-slide-in-left { animation: fx-slide-in-left 1.2s cubic-bezier(0.1, 0.9, 0.2, 1) forwards; }
+        .fx-zoom-in { animation: fx-zoom-in 1s ease-out forwards; }
+        .fx-drop-in { animation: fx-drop-in 1.2s cubic-bezier(0.25, 1, 0.5, 1) forwards; }
+        .fx-blur-in { animation: fx-blur-in 1.5s ease-out forwards; }
+        .fx-drop-in-and-shake { animation: fx-drop-in-and-shake 1.5s ease-in-out forwards; }
+        .fx-pulse-gentle { animation: fx-fade-in 1.5s forwards, fx-pulse-gentle 2.5s ease-in-out 1.5s infinite; }
+        .fx-shake-intense { animation: fx-fade-in 1s forwards, shake-intense 0.8s ease-in-out 1s infinite; }
+        .fx-wave-text { animation: fx-fade-in 1.5s forwards, fx-wave-text 2.5s ease-in-out 1.5s infinite; }
+        .fx-float-text { animation: fx-fade-in 1.5s forwards, fx-float-text 4s ease-in-out 1.5s infinite; }
+        .highlight { font-size: 6vw; }
+
+        /* --- SPECIAL EFFECTS: LINE BREAK --- */
+        #specialEffectsContainer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 6; }
+        .line-break-svg { position: absolute; overflow: visible; opacity: 0; animation: fx-fade-in 0.2s forwards; }
+        .line-break-svg line { stroke: white; stroke-width: 3px; stroke-linecap: round; }
+        .breaking-left { animation: break-left 1s ease-in-out 0.2s forwards; }
+        .breaking-right { animation: break-right 1s ease-in-out 0.2s forwards; }
+        @keyframes break-left { from { transform: translate(0,0) rotate(0); } to { opacity: 0; transform: translate(-100px, -50px) rotate(-45deg); } }
+        @keyframes break-right { from { transform: translate(0,0) rotate(0); } to { opacity: 0; transform: translate(100px, 50px) rotate(45deg); } }
+
+        /* --- UI & CONTROLS --- */
+        #preloader {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--dark-bg); z-index: 1000; display: none;
+            align-items: center; justify-content: center; flex-direction: column;
+            transition: opacity 0.5s ease;
+        }
+        #preloader p { font-size: 24px; margin-bottom: 20px; }
+        .loader-line { width: 200px; height: 3px; background: #444; border-radius: 3px; overflow: hidden; }
+        .loader-fill { width: 0%; height: 100%; background: var(--text-main); transition: width 0.3s ease; }
+        
+        .controls {
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            z-index: 100; display: flex; gap: 10px; backdrop-filter: blur(5px);
+            background: rgba(20,20,20,0.5); padding: 10px; border-radius: 15px;
+            border: 1px solid #444; transition: opacity 0.5s ease;
+        }
+        .btn {
+            padding: 10px 20px; background: transparent; border: 1px solid var(--text-dim);
+            color: var(--text-dim); border-radius: 10px; cursor: pointer; transition: all 0.3s ease-in-out;
+            font-size: 16px;
+        }
+        .btn:hover { background: var(--text-main); color: var(--dark-bg); border-color: var(--text-main); }
+        .btn:active { transform: scale(0.95); }
+
+        #visualizer {
+            position: fixed; bottom: 0; left: 0; width: 100%; height: 100px;
+            display: flex; align-items: flex-end; justify-content: center; gap: 4px; z-index: 1;
+            pointer-events: none;
+        }
+        .visualizer-bar {
+            width: 8px; background: linear-gradient(to top, #fff, rgba(255,255,255,0.2));
+            height: 0; transition: height 0.1s ease-out; border-radius: 2px 2px 0 0;
+        }
+        
+        @media (max-width: 768px) {
+            .lyric-line { font-size: 8vw; } .highlight { font-size: 9vw; }
+            .controls { padding: 5px; } .btn { padding: 8px 15px; font-size: 14px; }
+        }
+    </style>
+</head>
+<body>
+    <div id="preloader">
+        <p>Loading the experience...</p>
+        <div class="loader-line"><div class="loader-fill" id="loaderFill"></div></div>
+    </div>
+
+    <div id="mainContent">
+        <div class="moon"></div>
+        <div class="stars" id="starsContainer"></div>
+        <div class="hearts-container" id="heartsContainer" style="opacity: 0;"></div>
+        <div class="rain-container"></div>
+        <div class="ocean-waves" id="oceanWaves">
+            <div class="wave"></div><div class="wave"></div><div class="wave"></div>
+        </div>
+        <div class="lyrics-container">
+            <!-- FIXED: A permanent element for lyrics to prevent animation bugs -->
+            <div class="lyric-line" id="current-lyric">Click Play to begin the journey...</div>
+        </div>
+        <div id="specialEffectsContainer"></div>
+        <div id="visualizer"></div>
+        <div class="vignette"></div>
+    </div>
+    
+    <div class="controls" id="controls">
+        <button class="btn" onclick="startLyrics()">Play</button>
+        <button class="btn" onclick="pauseLyrics()">Pause</button>
+        <button class="btn" onclick="resetLyrics()">Reset</button>
+        <button class="btn" onclick="toggleFullscreen()">Fullscreen</button>
+    </div>
+
+    <audio id="song" src="https://ia803403.us.archive.org/35/items/ricky-montgomery-line-without-a-hook-lyrics/Ricky%20Montgomery%20-%20line%20without%20a%20hook%20%28lyrics%29.mp3" preload="auto" crossOrigin="anonymous"></audio>
+
+    <script>
+        // --- LYRICS DATA ---
+        const lyrics = [
+            { time: 0, text: "", duration: 1400, fx: 'fx-fade-in' },
+            { time: 1400, text: "I don't really give a damn about the way you touch me when we're alone", duration: 5100, fx: 'fx-shake-intense' },
+            { time: 6500, text: "You can hold my hand if no one's home", duration: 4100, fx: 'fx-fade-in' },
+            { time: 10600, text: "Do you like it when I'm away?", duration: 3500, fx: 'fx-blur-in' },
+            { time: 14100, text: "If I went and hurt my body, baby, would you love me the same?", duration: 3200, fx: 'fx-zoom-in' },
+            { time: 17300, text: "I can feel all my bones coming back, and I'm craving motion", duration: 5200, fx: 'fx-slide-in-left' },
+            { time: 22500, text: "Mama never really learned how to live by herself", duration: 2800, fx: 'fx-drop-in' },
+            { time: 25300, text: "It's a curse, and it's growing", duration: 3800, fx: 'fx-zoom-in' },
+            { time: 29100, text: "You're a pond, and I'm an ocean", duration: 3900, special: "ocean", fx: 'fx-pulse-gentle' },
+            { time: 33000, text: "Oh, all my emotions feel like explosions when you are around", duration: 9200, fx: 'fx-shake-intense' },
+            { time: 42200, text: "And I've found a way to kill the sound, oh", duration: 6500, fx: 'fx-blur-in' },
+            { time: 48700, text: "Oh, baby, I am a wreck when I'm without you", duration: 5400, special: "highlight", fx: 'fx-shake-intense' },
+            { time: 54100, text: "I need you here to stay", duration: 3100, fx: 'fx-fade-in' },
+            { time: 57200, text: "I broke all my bones that day I found you", duration: 4700, fx: 'fx-drop-in-and-shake' },
+            { time: 61900, text: "Crying at the lake", duration: 2900, special: "lake", fx: 'fx-wave-text' },
+            { time: 64800, text: "Was it something I said to make you", duration: 3000, fx: 'fx-slide-in-left' },
+            { time: 67800, text: "Feel like you're a burden?", duration: 3100, fx: 'fx-blur-in' },
+            { time: 70900, text: "Oh, and if I could take it all back", duration: 3400, fx: 'fx-zoom-in' },
+            { time: 74300, text: "I swear that I would pull you from the tide", duration: 6400, special: "ocean", fx: 'fx-pulse-gentle' },
+            { time: 85000, text: "I said no, I said no", duration: 3100, fx: 'fx-shake-intense' },
+            { time: 88100, text: "Listen close, it's a no", duration: 6200, fx: 'fx-fade-in' },
+            { time: 94300, text: "The wind is a-pounding on my back", duration: 3300, fx: 'fx-slide-in-left' },
+            { time: 97600, text: "And I found hope in a heart attack", duration: 3600, fx: 'fx-zoom-in' },
+            { time: 101200, text: "Oh, at last, it is past", duration: 1700, fx: 'fx-drop-in' },
+            { time: 102900, text: "Now I've got it, and you can't have it", duration: 7100, fx: 'fx-slide-in-left' },
+            { time: 110000, text: "Oh, baby, I am a wreck when I'm without you", duration: 4800, special: "highlight", fx: 'fx-shake-intense' },
+            { time: 114800, text: "I need you here to stay", duration: 3100, fx: 'fx-fade-in' },
+            { time: 117900, text: "I broke all my bones that day I found you", duration: 4400, fx: 'fx-drop-in-and-shake' },
+            { time: 122300, text: "Crying at the lake", duration: 3000, special: "lake", fx: 'fx-wave-text' },
+            { time: 125300, text: "Was it something I said to make you", duration: 3100, fx: 'fx-slide-in-left' },
+            { time: 128400, text: "Feel like you're a burden?", duration: 3100, fx: 'fx-blur-in' },
+            { time: 131500, text: "Oh, and if I could take it all back", duration: 3100, fx: 'fx-zoom-in' },
+            { time: 134600, text: "I swear that I would pull you from the tide", duration: 11100, special: "ocean", fx: 'fx-pulse-gentle' },
+            { time: 147400, text: "Darling, when I'm fast asleep", duration: 3400, fx: 'fx-blur-in' },
+            { time: 150800, text: "I've seen this person watching me", duration: 3600, fx: 'fx-slide-in-left' },
+            { time: 154400, text: "Saying, \"Is it worth it? Is it worth it?", duration: 4400, fx: 'fx-slide-in-left' },
+            { time: 158800, text: "Tell me, is it worth it?\"", duration: 4400, fx: 'fx-slide-in-left' },
+            { time: 176700, text: "Because there is something, and there is nothing", duration: 4000, fx: 'fx-zoom-in' },
+            { time: 180700, text: "There is nothing in between", duration: 3500, fx: 'fx-fade-in' },
+            { time: 184200, text: "And in my eyes, there is a tiny dancer", duration: 5400, fx: 'fx-float-text' },
+            { time: 189600, text: "Watching over me, he's singing", duration: 3200, fx: 'fx-fade-in' },
+            { time: 192800, text: "\"She's a, she's a lady, and I am just a boy\"", duration: 6500, special: "highlight", fx: 'fx-pulse-gentle' },
+            { time: 199300, text: "He's singing", duration: 900, fx: 'fx-zoom-in' },
+            { time: 200200, text: "\"She's a, she's a lady, and I am just a line without a--\"", duration: 8000, special: "highlight", fx: 'fx-pulse-gentle' },
+            { time: 208200, text: "Oh, baby, I am a wreck when I'm without you", duration: 5000, special: "highlight", fx: 'fx-shake-intense' },
+            { time: 213200, text: "I need you here to stay", duration: 3700, fx: 'fx-fade-in' },
+            { time: 216900, text: "Broke all my bones that day I found you", duration: 4400, fx: 'fx-drop-in-and-shake' },
+            { time: 221300, text: "Crying at the lake", duration: 2300, special: "lake", fx: 'fx-wave-text' },
+            { time: 223600, text: "Oh, was it something I said to make you", duration: 3400, fx: 'fx-slide-in-left' },
+            { time: 227000, text: "Feel like you're a burden?", duration: 3200, fx: 'fx-blur-in' },
+            { time: 230200, text: "Oh, and if I could take it all back", duration: 3000, fx: 'fx-zoom-in' },
+            { time: 233200, text: "I swear that I would pull you from the tide", duration: 6700, special: "ocean", fx: 'fx-pulse-gentle' }
+        ];
+
+        // --- CORE LOGIC & INITIALIZATION ---
+        const audio = document.getElementById('song');
+        const lyricEl = document.getElementById('current-lyric');
+        const oceanWaves = document.getElementById('oceanWaves');
+        const starsContainer = document.getElementById('starsContainer');
+        const heartsContainer = document.getElementById('heartsContainer');
+        const visualizerContainer = document.getElementById('visualizer');
+        const specialEffectsContainer = document.getElementById('specialEffectsContainer');
+        const preloader = document.getElementById('preloader');
+        const controls = document.getElementById('controls');
+        const loaderFill = document.getElementById('loaderFill');
+
+        let currentLyricIndex = -1, isPlaying = false, areHeartsActive = false;
+        let animationFrame;
+        
+        let audioContext, analyser, source, dataArray;
+        let lineBreakTriggered = false;
+
+        function setupElements() { createStars(); createHearts(); createVisualizerBars(64); }
+        function createStars() { for (let i = 0; i < 150; i++) starsContainer.appendChild(createParticleElement('star')); }
+        function createHearts() { for (let i = 0; i < 150; i++) heartsContainer.appendChild(createParticleElement('heart')); }
+        function createParticleElement(className) { const p = document.createElement('div'); p.className = className; if(className === 'star') { p.style.width = p.style.height = `${Math.random() * 2 + 1}px`; } p.style.top = `${Math.random() * 100}%`; p.style.left = `${Math.random() * 100}%`; p.style.animationDelay = `${Math.random() * 3}s`; p.style.animationDuration = `${Math.random() * 2 + 2}s`; return p; }
+        function createVisualizerBars(count) { for(let i=0; i<count; i++) { const bar = document.createElement('div'); bar.className = 'visualizer-bar'; visualizerContainer.appendChild(bar); } }
+
+        function setupAudioAPI() {
+            if (audioContext) return;
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            analyser = audioContext.createAnalyser();
+            source = audioContext.createMediaElementSource(audio);
+            source.connect(analyser);
+            analyser.connect(audioContext.destination);
+            analyser.fftSize = 256;
+            dataArray = new Uint8Array(analyser.frequencyBinCount);
+        }
+
+        function updateLoop() {
+            animationFrame = requestAnimationFrame(updateLoop);
+            if (!isPlaying || !analyser) return;
+
+            const currentTime = audio.currentTime * 1000;
+            
+            const ladySectionStartTime = 192800; const ladySectionEndTime = 208200;
+            if (currentTime >= ladySectionStartTime && currentTime < ladySectionEndTime) {
+                if (!areHeartsActive) { starsContainer.style.opacity = '0'; heartsContainer.style.opacity = '1'; areHeartsActive = true; }
+            } else {
+                if (areHeartsActive) { starsContainer.style.opacity = '1'; heartsContainer.style.opacity = '0'; areHeartsActive = false; }
+            }
+
+            for (let i = 0; i < lyrics.length; i++) {
+                if (currentTime >= lyrics[i].time && currentTime < lyrics[i].time + lyrics[i].duration) {
+                    if (currentLyricIndex !== i) {
+                        currentLyricIndex = i;
+                        const lyric = lyrics[i];
+                        
+                        // FIXED: This is the core fix for the "missing text" bug.
+                        // We update the single, permanent element instead of replacing it.
+                        lyricEl.textContent = lyric.text;
+                        lyricEl.className = `lyric-line ${lyric.special === 'highlight' ? 'highlight' : ''} ${lyric.fx || 'fx-fade-in'}`;
+                        
+                        if (lyric.text.includes('line without a--') && !lineBreakTriggered) {
+                            createLineBreakEffect();
+                            lineBreakTriggered = true;
+                        }
+
+                        // FIXED: Logic to show the ocean and keep it visible.
+                        if (lyric.special === 'ocean' || lyric.special === 'lake') {
+                            oceanWaves.style.opacity = '0.7';
+                        }
+                    }
+                    break;
+                }
+            }
+            
+            analyser.getByteFrequencyData(dataArray);
+            const bars = document.getElementsByClassName('visualizer-bar');
+            for(let i = 0; i < bars.length; i++) {
+                bars[i].style.height = `${dataArray[i] / 3}px`;
+            }
+        }
+        
+        function createLineBreakEffect() {
+            const rect = lyricEl.getBoundingClientRect();
+            const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+            svg.classList.add('line-break-svg');
+            const lineHalf1 = document.createElementNS("http://www.w3.org/2000/svg", "line");
+            const lineHalf2 = document.createElementNS("http://www.w3.org/2000/svg", "line");
+            
+            const lineWidth = rect.width * 0.8;
+            svg.style.cssText = `width:${lineWidth}px; height:5px; left:${rect.left + (rect.width - lineWidth) / 2}px; top:${rect.top - 20}px;`;
+            
+            lineHalf1.setAttribute('x1', '0'); lineHalf1.setAttribute('y1', '2.5'); lineHalf1.setAttribute('x2', `${lineWidth / 2}`); lineHalf1.setAttribute('y2', '2.5');
+            lineHalf2.setAttribute('x1', `${lineWidth / 2}`); lineHalf2.setAttribute('y1', '2.5'); lineHalf2.setAttribute('x2', `${lineWidth}`); lineHalf2.setAttribute('y2', '2.5');
+            
+            svg.appendChild(lineHalf1); svg.appendChild(lineHalf2);
+            specialEffectsContainer.appendChild(svg);
+            
+            setTimeout(() => { lineHalf1.classList.add('breaking-left'); lineHalf2.classList.add('breaking-right'); }, 2500);
+            setTimeout(() => svg.remove(), 4000);
+        }
+
+        function playWhenReady() {
+            preloader.style.opacity = '0';
+            controls.style.opacity = '1';
+            setTimeout(() => preloader.style.display = 'none', 500);
+
+            if (audioContext.state === 'suspended') audioContext.resume();
+            isPlaying = true;
+            audio.play();
+            updateLoop();
+        }
+
+        function startLyrics() {
+            if (isPlaying || audioContext) return;
+            
+            controls.style.opacity = '0';
+            preloader.style.display = 'flex';
+            setupAudioAPI();
+
+            audio.addEventListener('progress', () => {
+                if(audio.duration > 0 && audio.buffered.length > 0) {
+                    const progress = (audio.buffered.end(0) / audio.duration) * 100;
+                    loaderFill.style.width = `${progress}%`;
+                }
+            });
+            audio.addEventListener('canplaythrough', playWhenReady, { once: true });
+            if(audio.readyState >= 3) { playWhenReady(); } else { audio.load(); }
+        }
+
+        function pauseLyrics() { isPlaying = false; audio.pause(); }
+
+        function resetLyrics() {
+            if (!audioContext) return;
+            pauseLyrics();
+            audio.currentTime = 0;
+            currentLyricIndex = -1;
+            lineBreakTriggered = false;
+            lyricEl.textContent = 'Click Play to begin the journey...';
+            lyricEl.className = 'lyric-line';
+            oceanWaves.style.opacity = '0';
+            if (areHeartsActive) { starsContainer.style.opacity = '1'; heartsContainer.style.opacity = '0'; areHeartsActive = false; }
+        }
+
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) { document.documentElement.requestFullscreen(); }
+            else if (document.exitFullscreen) { document.exitFullscreen(); }
+        }
+
+        window.onload = setupElements;
+    </script>
+</body>
+</html>
